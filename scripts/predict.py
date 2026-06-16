@@ -1,3 +1,5 @@
+import pandas as pd
+
 import torch
 import os
 import argparse
@@ -40,12 +42,8 @@ class legion_cls_dataset(Dataset):
         super().__init__()
         self.args = args
         self.train = train
-        if train == True:
-            with open(args.train_json_file, 'r') as f:
-                self.data = json.load(f)
-        elif train == False:
-            with open(args.test_json_file, 'r') as f:
-                self.data = json.load(f)
+        self.data = pd.read_csv(args.train_json_file)
+
         self.processor = AutoProcessor.from_pretrained(
             "llava-hf/llava-1.5-7b-hf", revision='a272c74')
 
@@ -56,11 +54,12 @@ class legion_cls_dataset(Dataset):
         img_path = os.path.join(
             self.args.data_base_test, self.data[idx]['image_path'])
 
-        label = self.data[idx]['label_image']
+        input_text = "<image>Does the image looks real/fake?"
         image = Image.open(img_path)
+        label = self.data[idx]['label_image']
 
         inputs = self.processor(
-            text=self.data[idx]['conversations'][0]['value'],
+            text=input_text,
             images=image,
             return_tensors="pt",
             padding="max_length",
