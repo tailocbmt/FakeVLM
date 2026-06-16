@@ -53,12 +53,8 @@ class legion_cls_dataset(Dataset):
         return len(self.data)
 
     def __getitem__(self, idx):
-        if self.train == True:
-            img_path = os.path.join(
-                self.args.data_base_train, self.data[idx]['image_path'])
-        else:
-            img_path = os.path.join(
-                self.args.data_base_test, self.data[idx]['image_path'])
+        img_path = os.path.join(
+            self.args.data_base_test, self.data[idx]['image_path'])
 
         label = self.data[idx]['label_image']
         image = Image.open(img_path)
@@ -153,7 +149,7 @@ def validate(args, model, cls_test_dataloader):
             for i in range(output.shape[0]):
                 response = processor.decode(
                     output[i], skip_special_tokens=True).split('?')[-1]
-                print(response)
+                # print(response)
                 outputs.append({"image_path": paths[0][i], "output": response})
                 # pdb.set_trace()
                 if 'real' in response.split('.')[0].lower():
