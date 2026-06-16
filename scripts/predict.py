@@ -51,12 +51,13 @@ class legion_cls_dataset(Dataset):
         return len(self.data)
 
     def __getitem__(self, idx):
+        item = self.data.iloc[idx]
         img_path = os.path.join(
-            self.args.data_base_test, self.data[idx]['image_path'])
+            self.args.data_base_test, item['image_path'])
 
         input_text = "<image>Does the image looks real/fake?"
         image = Image.open(img_path)
-        label = self.data[idx]['label_image']
+        label = item['label_image']
 
         inputs = self.processor(
             text=input_text,
