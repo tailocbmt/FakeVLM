@@ -42,7 +42,7 @@ class legion_cls_dataset(Dataset):
         super().__init__()
         self.args = args
         self.train = train
-        self.data = pd.read_csv(args.train_json_file)
+        self.data = pd.read_csv(args.test_json_file)
 
         self.processor = AutoProcessor.from_pretrained(
             "llava-hf/llava-1.5-7b-hf", revision='a272c74')
