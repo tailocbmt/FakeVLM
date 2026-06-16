@@ -56,7 +56,7 @@ class legion_cls_dataset(Dataset):
             self.args.data_base_test, item['image_path'])
 
         input_text = "<image>Does the image looks real/fake?"
-        image = Image.open(img_path)
+        image = Image.open(img_path).convert('RGB').resize((256, 256))
         label = item['label_image']
 
         inputs = self.processor(
