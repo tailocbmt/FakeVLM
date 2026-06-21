@@ -10,6 +10,20 @@ from tqdm import tqdm
 from torch.utils.data import Dataset, DataLoader
 from safetensors.torch import load_file
 from transformers import AutoModel, AutoTokenizer
+from huggingface_hub import snapshot_download
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Legion Model Training")
+
+    # Model-specific settings
+    parser.add_argument(
+        "--model_path", default="meld_model", type=str)
+    parser.add_argument("--val_batch_size", default=1, type=int)
+    parser.add_argument("--workers", default=1, type=int)
+    parser.add_argument("--test_json_file", default="", type=str)
+    parser.add_argument("--output_path", default="", type=str)
+    return parser.parse_args()
 
 
 class MELDDetector(nn.Module):
@@ -50,6 +64,12 @@ class MELDDetector(nn.Module):
 
 
 def load_meld(model_dir, device="gpu"):
+    snapshot_download(
+        repo_id="anon-review-meld-2026/meld",
+        local_dir=model_dir,
+        local_dir_use_symlinks=False,  # copies actual files, not symlinks
+    )
+
     cfg = json.loads(Path(f"{model_dir}/meld_config.json").read_text())
     model = MELDDetector(
         backbone=cfg["backbone"],
@@ -62,19 +82,6 @@ def load_meld(model_dir, device="gpu"):
     state = load_file(f"{model_dir}/model.safetensors")
     model.load_state_dict(state, strict=True)
     return model.eval(), cfg
-
-
-def parse_args():
-    parser = argparse.ArgumentParser(description="Legion Model Training")
-
-    # Model-specific settings
-    parser.add_argument(
-        "--model_path", default="anon-review-meld-2026/meld", type=str)
-    parser.add_argument("--val_batch_size", default=1, type=int)
-    parser.add_argument("--workers", default=1, type=int)
-    parser.add_argument("--test_json_file", default="", type=str)
-    parser.add_argument("--output_path", default="", type=str)
-    return parser.parse_args()
 
 
 class legion_cls_dataset(Dataset):
