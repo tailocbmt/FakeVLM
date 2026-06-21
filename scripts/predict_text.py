@@ -63,7 +63,7 @@ class MELDDetector(nn.Module):
         return self.head_main(pooled).float()
 
 
-def load_meld(model_dir, device="gpu"):
+def load_meld(model_dir, device="cuda"):
     snapshot_download(
         repo_id="anon-review-meld-2026/meld",
         local_dir=model_dir,
@@ -103,8 +103,14 @@ class legion_cls_dataset(Dataset):
         input_text = f"{item['title']} {item['title']}"
         label = item['label_text']
 
-        inputs = self.processor(input_text, return_tensors="pt", truncation=True,
-                                max_length=self.cfg["max_length"])
+        inputs = self.processor(
+            input_text,
+            return_tensors="pt",
+            truncation=True,
+            max_length=self.cfg["max_length"],
+            padding="max_length")
+
+        inputs = {key: val.squeeze(0) for key, val in inputs.items()}
 
         return inputs, label
 
