@@ -79,7 +79,7 @@ def load_model(args):
         args.model_path,
         torch_dtype=torch.bfloat16,
         low_cpu_mem_usage=True,
-        use_flash_attention_2=True,
+        attn_implementation="flash_attention_2",
         # revision='a272c74',
     ).eval().cuda()
     print("Successfully loaded model from:", args.model_path)
