@@ -10,7 +10,7 @@ from tqdm import tqdm
 from PIL import Image
 from torch.utils.data import Dataset, DataLoader
 from safetensors.torch import load_file
-from transformers import AutoModelForImageClassification, AutoProcessor
+from transformers import AutoModelForImageClassification, AutoProcessor, AutoTokenizer
 
 
 def parse_args():
@@ -182,7 +182,7 @@ def main():
     model = AutoModelForImageClassification.from_pretrained(args.model)
     model.eval().to(device)
 
-    cls_test_dataset = legion_cls_dataset(args, cfg=cfg)
+    cls_test_dataset = legion_cls_dataset(args, cfg=None)
     cls_test_dataloader = DataLoader(
         cls_test_dataset,
         batch_size=args.val_batch_size,
