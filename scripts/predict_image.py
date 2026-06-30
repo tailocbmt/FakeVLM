@@ -179,7 +179,7 @@ def main():
     args = parse_args()
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    model = AutoModelForImageClassification.from_pretrained(args.model)
+    model = AutoModelForImageClassification.from_pretrained(args.model_path)
     model.eval().to(device)
 
     cls_test_dataset = legion_cls_dataset(args, cfg=None)
