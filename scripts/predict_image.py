@@ -51,8 +51,6 @@ class legion_cls_dataset(Dataset):
         inputs = self.processor(
             images=image,
             return_tensors="pt",
-            max_length=1024,
-            truncation=True
         )
 
         inputs = {key: val.squeeze(0) for key, val in inputs.items()}
