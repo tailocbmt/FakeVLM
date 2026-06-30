@@ -120,10 +120,10 @@ def validate(args, model, cls_test_dataloader, device):
         for inputs, labels in tqdm(cls_test_dataloader, desc="Evaluating"):
             # Move inputs to device and squeeze the extra dimension that HuggingFace
             # tokenizers sometimes add when return_tensors="pt" is combined with DataLoader
-            input_ids = inputs["input_ids"].squeeze(1).to(device)
+            inputs["pixel_values"] = inputs["pixel_values"].squeeze().to(device)
 
             # Get logits and calculate probabilities
-            logits = model(input_ids)
+            logits = model(inputs)
             probs = torch.softmax(logits, dim=-1)
 
             # Get the predicted class (0 for Real, 1 for Fake)
