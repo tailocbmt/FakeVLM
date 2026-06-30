@@ -45,7 +45,7 @@ class legion_cls_dataset(Dataset):
         self.data = pd.read_csv(args.test_json_file)
 
         self.processor = AutoProcessor.from_pretrained(
-            "llava-hf/llava-1.5-7b-hf", revision='a272c74')
+            "laion/CLIP-ViT-L-14-CommonPool.XL-s13B-b90K")
 
     def __len__(self):
         return len(self.data)
@@ -133,7 +133,7 @@ def calculate_results_acc(results):
 
 def validate(args, model, cls_test_dataloader):
     processor = AutoProcessor.from_pretrained(
-        "llava-hf/llava-1.5-7b-hf", revision='a272c74')
+        "llava-hf/llava-1.5-7b-hf")
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     results = {}
     outputs = []
