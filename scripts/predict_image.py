@@ -123,7 +123,7 @@ def validate(args, model, cls_test_dataloader, device):
             inputs["pixel_values"] = inputs["pixel_values"].squeeze().to(device)
 
             # Get logits and calculate probabilities
-            logits = model(inputs)
+            logits = model(**inputs)
             probs = torch.softmax(logits, dim=-1)
 
             # Get the predicted class (0 for Real, 1 for Fake)
