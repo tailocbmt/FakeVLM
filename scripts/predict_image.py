@@ -34,7 +34,7 @@ class legion_cls_dataset(Dataset):
         self.cfg = cfg
         self.data = pd.read_csv(args.test_json_file)
 
-        self.processor = AutoTokenizer.from_pretrained(
+        self.processor = AutoProcessor.from_pretrained(
             args.model_path)   # tokenizer ships in this repo
 
     def __len__(self):
