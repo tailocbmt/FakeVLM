@@ -36,8 +36,8 @@ class legion_cls_dataset(Dataset):
         self.cfg = cfg
         self.data = pd.read_csv(args.test_json_file)
 
-        self.processor = AutoProcessor.from_pretrained(
-            args.model_path)   # tokenizer ships in this repo
+        # self.processor = AutoProcessor.from_pretrained(
+        # args.model_path)   # tokenizer ships in this repo
 
     def __len__(self):
         return len(self.data)
@@ -50,14 +50,9 @@ class legion_cls_dataset(Dataset):
         image = Image.open(img_path).convert('RGB')
         label = item['label_image']
 
-        inputs = self.processor(
-            images=image,
-            return_tensors="pt",
-        )
-
         # inputs = {key: val.squeeze(0) for key, val in inputs.items()}
 
-        return inputs, label
+        return image, label
 
 
 def calculate_results_acc(results):
@@ -116,33 +111,31 @@ def validate(args, model, cls_test_dataloader, device):
         }
     }
 
-    model.eval()
-
     with torch.no_grad():
         for inputs, labels in tqdm(cls_test_dataloader, desc="Evaluating"):
             # Move inputs to device and squeeze the extra dimension that HuggingFace
             # tokenizers sometimes add when return_tensors="pt" is combined with DataLoader
-            inputs["pixel_values"] = inputs["pixel_values"].squeeze().to(device)
+            # inputs["pixel_values"] = inputs["pixel_values"].squeeze().to(device)
 
             # Get logits and calculate probabilities
-            model_outputs = model(**inputs)
-            logits = model_outputs.logits
-            probs = torch.softmax(logits, dim=-1)
+            model_outputs = model.predict_batch(**inputs)
+            # logits = model_outputs.logits
+            # probs = torch.softmax(logits, dim=-1)
 
             # Get the predicted class (0 for Real, 1 for Fake)
             # using argmax across the batch
-            preds = torch.argmax(probs, dim=-1)
+            # preds = torch.argmax(probs, dim=-1)
 
             # Iterate over the batch to populate the results dictionary
             for i in range(len(labels)):
-                pred = preds[i].item()
+                pred = model_outputs[i]['pred_int']
 
                 # IMPORTANT: Adjust this based on how your labels are stored in the CSV.
                 # Here we assume labels are integers: 0 for real, 1 for fake.
                 # If they are strings, you might need: int(labels[i] == 'fake')
                 true_label = int(labels[i])
                 # The raw "MELD score" probability
-                prob_fake = probs[i, 1].item()
+                prob_fake = model_outputs[i]['probability']
 
                 outputs.append({
                     'label': true_label,
@@ -187,7 +180,7 @@ def main():
 
     # Initialize detector
     detector_wrapper = AIImageDetector(model_path)
-    model = detector_wrapper.model.to(device)
+    model = detector_wrapper.to(device)
     model.eval()
 
     cls_test_dataset = legion_cls_dataset(args, cfg=None)

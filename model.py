@@ -236,6 +236,56 @@ class AIImageDetector:
             "confidence": confidence
         }
 
+    @torch.no_grad()
+    def predict_batch(self, pil_images: list) -> list[dict]:
+        """
+        Predict a batch of PIL Images directly from a DataLoader.
+
+        Args:
+            pil_images: list of PIL.Image objects
+        """
+        if not pil_images:
+            return []
+
+        # Ensure all images in the batch are RGB
+        processed_images = [
+            img.convert('RGB') if img.mode != 'RGB' else img for img in pil_images
+        ]
+
+        # 1. SigLIP Preprocessing (Handles lists natively)
+        siglip_inputs = self.siglip_processor(
+            images=processed_images, return_tensors="pt")
+        siglip_pixels = siglip_inputs["pixel_values"].to(self.device)
+
+        # 2. DinoV2 Preprocessing (Stack individual transforms)
+        dinov2_tensors = [self.dinov2_transform(
+            img) for img in processed_images]
+        dinov2_pixels = torch.stack(dinov2_tensors).to(self.device)
+
+        # 3. Inference
+        with autocast('cuda', enabled=self.device.type == 'cuda'):
+            logits, _, _ = self.model(siglip_pixels, dinov2_pixels)
+            if logits.dim() > 1:
+                logits = logits.squeeze(-1)
+
+        # 4. Probabilities & Vectorized Metrics
+        probabilities = torch.sigmoid(logits).cpu().tolist()
+
+        results = []
+        for prob in probabilities:
+            prediction = "ai-generated" if prob > 0.5 else "real"
+            confidence = prob if prob > 0.5 else 1 - prob
+
+            results.append({
+                "probability": prob,
+                "prediction": prediction,
+                "confidence": confidence,
+                # Integer mapping for easy validation comparisons (0: Real, 1: AI)
+                "pred_int": 1 if prob > 0.5 else 0
+            })
+
+        return results
+
     def __call__(self, image):
         """Shorthand for predict()."""
         return self.predict(image)
