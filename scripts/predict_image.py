@@ -168,6 +168,13 @@ def validate(args, model, cls_test_dataloader, device):
     return metrics, outputs
 
 
+def pil_collate_fn(batch):
+    # batch is a list of tuples: [(image1, label1), (image2, label2), ...]
+    images = [item[0] for item in batch]
+    labels = [item[1] for item in batch]
+    return images, labels
+
+
 def main():
     args = parse_args()
 
@@ -190,6 +197,7 @@ def main():
         shuffle=False,
         num_workers=args.workers,
         pin_memory=True,
+        collate_fn=pil_collate_fn  # <-- This prevents the TypeError!
     )
     validate(args, model, cls_test_dataloader, device)
 
