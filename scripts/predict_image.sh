@@ -1,5 +1,5 @@
 python scripts/predict_image.py \
-  --model_path "Smogy/SMOGY-Ai-images-detector" \
+  --model_path "Bombek1/ai-image-detector-siglip-dinov2" \
   --val_batch_size 256 \
   --workers 16 \
   --output_path results/fakevlm_image.json \
