@@ -180,8 +180,8 @@ def main():
 
     # Initialize detector
     detector_wrapper = AIImageDetector(model_path)
-    model = detector_wrapper.to(device)
-    model.eval()
+    # model = detector_wrapper.to(device)
+    # model.eval()
 
     cls_test_dataset = legion_cls_dataset(args, cfg=None)
     cls_test_dataloader = DataLoader(
