@@ -179,7 +179,7 @@ def main():
     )
 
     # Initialize detector
-    detector_wrapper = AIImageDetector(model_path)
+    model = AIImageDetector(model_path)
     # model = detector_wrapper.to(device)
     # model.eval()
 
