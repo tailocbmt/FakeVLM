@@ -94,8 +94,8 @@ def calculate_results_acc(results):
         'total_right': sum(r['right']['right_real'] + r['right']['right_fake'] for r in results.values()),
         'total_wrong': sum(r['wrong']['wrong_real'] + r['wrong']['wrong_fake'] for r in results.values())
     }
-    global_stats['global_accuracy'] = global_stats['total_right'] /
-    (global_stats['total_right'] + global_stats['total_wrong'])
+    global_stats['global_accuracy'] = global_stats['total_right'] / \
+        (global_stats['total_right'] + global_stats['total_wrong'])
 
     return {
         'category_acc': acc_results,
