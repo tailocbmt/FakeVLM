@@ -11,6 +11,8 @@ from PIL import Image
 from torch.utils.data import Dataset, DataLoader
 from safetensors.torch import load_file
 from transformers import AutoModelForImageClassification, AutoProcessor, AutoTokenizer
+from huggingface_hub import hf_hub_download
+from model import AIImageDetector
 
 
 def parse_args():
@@ -53,7 +55,7 @@ class legion_cls_dataset(Dataset):
             return_tensors="pt",
         )
 
-        inputs = {key: val.squeeze(0) for key, val in inputs.items()}
+        # inputs = {key: val.squeeze(0) for key, val in inputs.items()}
 
         return inputs, label
 
@@ -177,8 +179,16 @@ def main():
     args = parse_args()
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    model = AutoModelForImageClassification.from_pretrained(args.model_path)
-    model.eval().to(device)
+    # Download model
+    model_path = hf_hub_download(
+        repo_id=args.model_path,
+        filename="pytorch_model.pt"
+    )
+
+    # Initialize detector
+    detector_wrapper = AIImageDetector(model_path)
+    model = detector_wrapper.model.to(device)
+    model.eval()
 
     cls_test_dataset = legion_cls_dataset(args, cfg=None)
     cls_test_dataloader = DataLoader(
