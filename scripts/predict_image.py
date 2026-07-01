@@ -118,7 +118,7 @@ def validate(args, model, cls_test_dataloader, device):
             # inputs["pixel_values"] = inputs["pixel_values"].squeeze().to(device)
 
             # Get logits and calculate probabilities
-            model_outputs = model.predict_batch(**inputs)
+            model_outputs = model.predict_batch(inputs)
             # logits = model_outputs.logits
             # probs = torch.softmax(logits, dim=-1)
 
