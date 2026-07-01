@@ -45,7 +45,7 @@ class legion_cls_dataset(Dataset):
         img_path = os.path.join(
             self.args.data_base_test, item['image_path'])
 
-        image = Image.open(img_path).convert('RGB').resize((256, 256))
+        image = Image.open(img_path).convert('RGB')
         label = item['label_image']
 
         inputs = self.processor(
@@ -94,8 +94,8 @@ def calculate_results_acc(results):
         'total_right': sum(r['right']['right_real'] + r['right']['right_fake'] for r in results.values()),
         'total_wrong': sum(r['wrong']['wrong_real'] + r['wrong']['wrong_fake'] for r in results.values())
     }
-    global_stats['global_accuracy'] = global_stats['total_right'] / \
-        (global_stats['total_right'] + global_stats['total_wrong'])
+    global_stats['global_accuracy'] = global_stats['total_right'] /
+    (global_stats['total_right'] + global_stats['total_wrong'])
 
     return {
         'category_acc': acc_results,
